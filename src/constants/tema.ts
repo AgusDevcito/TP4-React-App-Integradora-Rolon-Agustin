@@ -16,6 +16,7 @@ export type PaletaColores = {
   error: string;
   errorFondo: string;
   superposicionOscura: string;
+  textoSobreOscuro: string;
 };
 
 export const COLORES_CLARO: PaletaColores = {
@@ -36,6 +37,7 @@ export const COLORES_CLARO: PaletaColores = {
   error: '#B91C1C',
   errorFondo: '#FDECEC',
   superposicionOscura: 'rgba(0, 0, 0, 0.55)',
+  textoSobreOscuro: '#FFFFFF',
 };
 
 export const COLORES_OSCURO: PaletaColores = {
@@ -56,6 +58,7 @@ export const COLORES_OSCURO: PaletaColores = {
   error: '#F87171',
   errorFondo: '#3F1D1D',
   superposicionOscura: 'rgba(0, 0, 0, 0.72)',
+  textoSobreOscuro: '#FFFFFF',
 };
 
 export const ESPACIADO = {
