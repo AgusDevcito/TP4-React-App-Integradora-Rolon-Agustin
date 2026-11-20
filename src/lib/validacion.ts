@@ -15,6 +15,10 @@ export function buscarLibroPorIsbn(isbn: string): Libro | undefined {
   return LIBROS.find((libro) => libro.isbn === isbn);
 }
 
+export function obtenerCatalogoBase(): Libro[] {
+  return LIBROS;
+}
+
 export function sumarDias(fecha: Date, dias: number): Date {
   const copia = new Date(fecha.getTime());
   copia.setDate(copia.getDate() + dias);
