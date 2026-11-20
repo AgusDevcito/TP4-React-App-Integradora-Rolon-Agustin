@@ -1,0 +1,122 @@
+import type { Libro } from '../types';
+
+export const LIBROS: Libro[] = [
+  {
+    isbn: '9780132350884',
+    titulo: 'Clean Code: Manual de estilo para el desarrollo ágil de software',
+    autor: 'Robert C. Martin',
+    anio: 2008,
+    ejemplares: 2,
+  },
+  {
+    isbn: '9789500426992',
+    titulo: 'El Aleph',
+    autor: 'Jorge Luis Borges',
+    anio: 1949,
+    ejemplares: 3,
+  },
+  {
+    isbn: '9789500426985',
+    titulo: 'Ficciones',
+    autor: 'Jorge Luis Borges',
+    anio: 1944,
+    ejemplares: 0,
+  },
+  {
+    isbn: '9780135957059',
+    titulo: 'The Pragmatic Programmer',
+    autor: 'David Thomas y Andrew Hunt',
+    anio: 2019,
+    ejemplares: 0,
+  },
+  {
+    isbn: '9781492078005',
+    titulo: 'Head First Design Patterns',
+    autor: 'Eric Freeman y Elisabeth Robson',
+    anio: 2020,
+    ejemplares: 1,
+  },
+  {
+    isbn: '9780262046305',
+    titulo: 'Introduction to Algorithms',
+    autor: 'Thomas H. Cormen',
+    anio: 2022,
+    ejemplares: 0,
+  },
+  {
+    isbn: '9781491950357',
+    titulo: 'Designing Data-Intensive Applications',
+    autor: 'Martin Kleppmann',
+    anio: 2017,
+    ejemplares: 2,
+  },
+  {
+    isbn: '9781593279509',
+    titulo: 'Eloquent JavaScript',
+    autor: 'Marijn Haverbeke',
+    anio: 2018,
+    ejemplares: 4,
+  },
+  {
+    isbn: '9781492056355',
+    titulo: 'Programming TypeScript',
+    autor: 'Boris Cherny',
+    anio: 2019,
+    ejemplares: 1,
+  },
+  {
+    isbn: '9781098115180',
+    titulo: 'Learning React',
+    autor: 'Alex Banks y Eve Porcello',
+    anio: 2020,
+    ejemplares: 0,
+  },
+  {
+    isbn: '9780134757599',
+    titulo: 'Refactoring: Improving the Design of Existing Code',
+    autor: 'Martin Fowler',
+    anio: 2018,
+    ejemplares: 2,
+  },
+  {
+    isbn: '9780321125217',
+    titulo: 'Domain-Driven Design',
+    autor: 'Eric Evans',
+    anio: 2003,
+    ejemplares: 1,
+  },
+  {
+    isbn: '9789500729093',
+    titulo: 'Rayuela',
+    autor: 'Julio Cortázar',
+    anio: 1963,
+    ejemplares: 3,
+  },
+  {
+    isbn: '9789875666474',
+    titulo: 'El túnel',
+    autor: 'Ernesto Sabato',
+    anio: 1948,
+    ejemplares: 2,
+  },
+  {
+    isbn: '9789877384840',
+    titulo: 'Sobre héroes y tumbas',
+    autor: 'Ernesto Sabato',
+    anio: 1961,
+    ejemplares: 1,
+  },
+  {
+    isbn: '9788497592208',
+    titulo: 'Cien años de soledad',
+    autor: 'Gabriel García Márquez',
+    anio: 1967,
+    ejemplares: 2,
+  },
+];
+
+export const LISTAS_ESPERA_INICIALES: Record<string, string[]> = {
+  '9789500426985': ['Lucía Fernández', 'Mateo Gómez'],
+  '9780135957059': ['Sofía Martínez'],
+  '9780262046305': ['Valentín Ruiz', 'Camila Díaz'],
+};
