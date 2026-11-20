@@ -1,4 +1,14 @@
-import * as Notifications from 'expo-notifications';
+import {
+  AndroidImportance,
+  cancelScheduledNotificationAsync,
+  getPermissionsAsync,
+  requestPermissionsAsync,
+  SchedulableTriggerInputTypes,
+  scheduleNotificationAsync,
+  setNotificationChannelAsync,
+  setNotificationHandler,
+  type NotificationPermissionsStatus,
+} from 'expo-notifications';
 import { Platform } from 'react-native';
 
 import {
@@ -7,7 +17,7 @@ import {
 } from '../constants/credenciales';
 
 export function configurarManejadorNotificaciones(): void {
-  Notifications.setNotificationHandler({
+  setNotificationHandler({
     handleNotification: async () => ({
       shouldShowBanner: true,
       shouldShowList: true,
@@ -21,35 +31,35 @@ export async function asegurarCanalPrestamos(): Promise<void> {
   if (Platform.OS !== 'android') {
     return;
   }
-  await Notifications.setNotificationChannelAsync(CANAL_NOTIFICACIONES_ID, {
+  await setNotificationChannelAsync(CANAL_NOTIFICACIONES_ID, {
     name: 'Recordatorios de préstamos',
     description: 'Avisos antes de la devolución y entrega de libros reservados.',
-    importance: Notifications.AndroidImportance.HIGH,
+    importance: AndroidImportance.HIGH,
     vibrationPattern: [0, 250, 250, 250],
   });
 }
 
-export async function consultarPermisoNotificaciones(): Promise<Notifications.NotificationPermissionsStatus> {
-  return Notifications.getPermissionsAsync();
+export async function consultarPermisoNotificaciones(): Promise<NotificationPermissionsStatus> {
+  return getPermissionsAsync();
 }
 
-export async function solicitarPermisoNotificaciones(): Promise<Notifications.NotificationPermissionsStatus> {
+export async function solicitarPermisoNotificaciones(): Promise<NotificationPermissionsStatus> {
   await asegurarCanalPrestamos();
-  return Notifications.requestPermissionsAsync();
+  return requestPermissionsAsync();
 }
 
 export async function programarRecordatorioDevolucion(
   tituloLibro: string,
 ): Promise<string> {
   await asegurarCanalPrestamos();
-  return Notifications.scheduleNotificationAsync({
+  return scheduleNotificationAsync({
     content: {
       title: 'Recordatorio de devolución · Biblioteca IPF',
       body: `Recordá devolver "${tituloLibro}" antes del vencimiento del préstamo.`,
       sound: true,
     },
     trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      type: SchedulableTriggerInputTypes.TIME_INTERVAL,
       seconds: SEGUNDOS_RECORDATORIO_DEMO,
       repeats: false,
       channelId: CANAL_NOTIFICACIONES_ID,
@@ -59,7 +69,7 @@ export async function programarRecordatorioDevolucion(
 
 export async function cancelarNotificacion(notificacionId: string): Promise<void> {
   try {
-    await Notifications.cancelScheduledNotificationAsync(notificacionId);
+    await cancelScheduledNotificationAsync(notificacionId);
   } catch {
     // Si la notificación ya se disparó o fue descartada, ignoramos el error.
   }
@@ -68,12 +78,12 @@ export async function cancelarNotificacion(notificacionId: string): Promise<void
 export async function enviarNotificacionEntrega(
   tituloLibro: string,
 ): Promise<boolean> {
-  const estadoPermiso = await Notifications.getPermissionsAsync();
+  const estadoPermiso = await getPermissionsAsync();
   if (!estadoPermiso.granted) {
     return false;
   }
   await asegurarCanalPrestamos();
-  await Notifications.scheduleNotificationAsync({
+  await scheduleNotificationAsync({
     content: {
       title: 'Tu libro ya está disponible · Biblioteca IPF',
       body: `"${tituloLibro}" pasó a estar en préstamo a tu nombre. Podés retirarlo en mostrador.`,

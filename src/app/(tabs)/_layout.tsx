@@ -27,7 +27,11 @@ export default function LayoutTabs() {
           title: 'Catálogo',
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="library-outline" size={size} color={color} />
+            <Ionicons
+              name="library-outline"
+              size={size}
+              color={typeof color === 'string' ? color : colores.primario}
+            />
           ),
         }}
       />
@@ -36,7 +40,11 @@ export default function LayoutTabs() {
         options={{
           title: 'Mis reservas',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="bookmark-outline" size={size} color={color} />
+            <Ionicons
+              name="bookmark-outline"
+              size={size}
+              color={typeof color === 'string' ? color : colores.primario}
+            />
           ),
         }}
       />

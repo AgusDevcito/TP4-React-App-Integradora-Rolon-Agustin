@@ -37,11 +37,11 @@ export default function PantallaBuscar() {
 
   useEffect(() => {
     let cancelado = false;
-    setCargando(true);
-    setError(null);
 
     const temporizador = setTimeout(() => {
       async function ejecutarBusqueda() {
+        setCargando(true);
+        setError(null);
         try {
           const datos = await buscarLibros(consulta);
           if (!cancelado) {
