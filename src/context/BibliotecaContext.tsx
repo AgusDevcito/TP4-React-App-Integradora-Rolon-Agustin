@@ -130,7 +130,17 @@ export function BibliotecaProvider({ children }: PropsBibliotecaProvider) {
   }, [hidratado, prestamos, pilaRecientes, listasEspera, avisos]);
 
   const recientes = useMemo(() => {
-    return pilaRecientes.aArray().slice(-3).reverse();
+    const vistos = new Set<string>();
+    const ultimos: Libro[] = [];
+    const historial = pilaRecientes.aArray();
+    for (let i = historial.length - 1; i >= 0 && ultimos.length < 3; i -= 1) {
+      const libro = historial[i];
+      if (!vistos.has(libro.isbn)) {
+        vistos.add(libro.isbn);
+        ultimos.push(libro);
+      }
+    }
+    return ultimos;
   }, [pilaRecientes]);
 
   const obtenerEjemplaresDisponibles = useCallback(
