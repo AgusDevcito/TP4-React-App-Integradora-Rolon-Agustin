@@ -154,6 +154,40 @@ Reemplazá `IP` por la IP local que muestra Expo al ejecutar `npx expo start`:
 
 ---
 
+## Capturas de la aplicación (probada en Android con Expo Go)
+
+### Catálogo (cargando, error y datos)
+
+| Cargando | Error con reintentar | Datos y vistos recientemente |
+| :---: | :---: | :---: |
+| ![Catálogo cargando](capturas/01-catalogo-cargando.png) | ![Catálogo con error](capturas/02-catalogo-error.png) | ![Catálogo con datos](capturas/03-catalogo-datos.jpg) |
+
+### Buscador, detalle inexistente y reservas
+
+| Buscador (`/buscar?q=`) | Detalle inexistente (`/libro/123`) | Reserva con ejemplares | Reserva sin ejemplares (lista de espera) |
+| :---: | :---: | :---: | :---: |
+| ![Buscador](capturas/04-buscador.png) | ![Detalle inexistente](capturas/05-detalle-inexistente.png) | ![Reserva con ejemplares](capturas/06-reserva-con-ejemplares.jpg) | ![Reserva sin ejemplares](capturas/07-reserva-sin-ejemplares.jpg) |
+
+### Escáner y permisos de cámara
+
+| Modal previo (`/permisos/camara`) | Diálogo del sistema | Cámara bloqueada + ingreso manual |
+| :---: | :---: | :---: |
+| ![Modal previo de cámara](capturas/08-escaner-permiso-previo.png) | ![Diálogo del sistema](capturas/09-escaner-dialogo-sistema.png) | ![Escáner bloqueado](capturas/10-escaner-bloqueado.jpg) |
+
+### Notificación recibida y pantalla 404
+
+| Notificación de recordatorio (15 s) | Pantalla 404 (`/ruta-inexistente`) |
+| :---: | :---: |
+| ![Notificación recibida](capturas/11-notificacion-recibida.jpg) | ![Pantalla 404](capturas/15-pantalla-404.png) |
+
+### Mostrador protegido (antes y después de "Entregar al siguiente")
+
+| Mostrador antes | Después de entregar *Ficciones* | Después de entregar *The Pragmatic Programmer* |
+| :---: | :---: | :---: |
+| ![Mostrador antes](capturas/12-mostrador-antes.jpg) | ![Mostrador después 1](capturas/13-mostrador-despues-1.jpg) | ![Mostrador después 2](capturas/14-mostrador-despues-2.jpg) |
+
+---
+
 ## Salida de verificaciones
 
 ### `npx tsc --noEmit`
@@ -167,7 +201,6 @@ $ npx tsc --noEmit
 
 ```text
 $ npx expo lint
-npx eslint C:\Users\agust\OneDrive\Desktop\React-TP4\src --fix=false --cache=true --cache-location=C:\Users\agust\OneDrive\Desktop\React-TP4\.expo\cache\eslint\
 (sin errores ni advertencias — código de salida 0)
 ```
 

@@ -450,15 +450,15 @@ En nuestra app, el `notificacionId` se guarda dentro del objeto `Prestamo` en `B
 
 #### c) Canal de notificaciones en Android 13+ vs Android 12
 
-- **Android 13 (API 33) o superior:** introdujo el permiso en tiempo de ejecución `POST_NOTIFICATIONS`. En Android 13+, el sistema solo muestra el diálogo de permiso si la app tiene al menos un canal de notificación creado; además, crear el canal `"prestamos"` antes de pedir el permiso garantiza que el canal exista configurado con `AndroidImportance.HIGH` en cuanto se conceda. En `src/lib/notificaciones.ts` (líneas 42–45), `solicitarPermisoNotificaciones()` llama primero a `await asegurarCanalPrestamos()` y recién después a `requestPermissionsAsync()`.
+- **Android 13 (API 33) o superior:** introdujo el permiso en tiempo de ejecución `POST_NOTIFICATIONS`. En Android 13+, el sistema solo muestra el diálogo de permiso si la app tiene al menos un canal de notificación creado; además, crear el canal `"prestamos"` antes de pedir el permiso garantiza que el canal exista configurado con `AndroidImportance.HIGH` en cuanto se conceda. En `src/lib/notificaciones.ts` (líneas 53–56), `solicitarPermisoNotificaciones()` llama primero a `await asegurarCanalPrestamos()` y recién después a `requestPermissionsAsync()`.
 - **Android 12 (API 32) o inferior:** las notificaciones están permitidas por defecto al instalar la app (no existe el diálogo `POST_NOTIFICATIONS`), por lo que `requestPermissionsAsync()` resuelve como concedido sin mostrar popup; el canal `"prestamos"` sigue siendo necesario igualmente (desde Android 8 / API 26) para que el sistema muestre las notificaciones con prioridad alta.
 
 #### d) Entrega desde el mostrador con permiso denegado
 
-Cuando el personal toca “Entregar al siguiente” y la persona del frente es el alumno actual (`ALUMNO_ACTUAL`), `entregarAlSiguiente` (`src/context/BibliotecaContext.tsx`, líneas 346–357) llama a `enviarNotificacionEntrega(libro.titulo)` (`src/lib/notificaciones.ts`, líneas 75–92):
+Cuando el personal toca “Entregar al siguiente” y la persona del frente es el alumno actual (`ALUMNO_ACTUAL`), `entregarAlSiguiente` (`src/context/BibliotecaContext.tsx`, líneas 346–357) llama a `enviarNotificacionEntrega(libro.titulo)` (`src/lib/notificaciones.ts`, líneas 85–106):
 
 ```ts
-// src/lib/notificaciones.ts (líneas 75-92)
+// src/lib/notificaciones.ts (líneas 85-106)
 export async function enviarNotificacionEntrega(
   tituloLibro: string,
 ): Promise<boolean> {
@@ -467,8 +467,12 @@ export async function enviarNotificacionEntrega(
     return false;
   }
   await asegurarCanalPrestamos();
-  await scheduleNotificationAsync({ ... });
-  return true;
+  try {
+    await scheduleNotificationAsync({ ... });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 // src/context/BibliotecaContext.tsx (líneas 346-357)
@@ -524,7 +528,7 @@ Porque en `app.json` (líneas 45–53) se desactivó explícitamente el micrófo
 En **Expo Go** la app corre dentro del binario genérico de Expo Go, cuyo `Info.plist` y `AndroidManifest.xml` ya están precompilados:
 1. **El texto de propósito personalizado (`NSCameraUsageDescription`) en iOS:** Expo Go muestra su propio texto genérico de cámara, no el definido en nuestro `app.json`.
 2. **`blockedPermissions` y el `AndroidManifest.xml` final:** Expo Go declara los permisos de todos los módulos que trae embebidos (ubicación, audio, etc.).
-3. **El `scheme: "bibliotecaipf"` nativo y ciertos comportamientos de notificaciones en Android 13+/iOS (ícono/nombre de la app y canal por defecto del plugin):** en Expo Go los deep links usan `exp://IP:8081/--/...` en lugar de `bibliotecaipf://`.
+3. **El `scheme: "bibliotecaipf"` nativo y el canal personalizado `"prestamos"` en Android:** en Expo Go los deep links usan `exp://IP:8081/--/...` en lugar de `bibliotecaipf://`, y además en Expo Go sobre Android SDK 58 `setNotificationChannelAsync` arroja un `NullPointerException` nativo conocido (`expo/expo#53907`), por lo que en `src/lib/notificaciones.ts` (líneas 30–47) capturamos ese error para hacer fallback al canal por defecto en Expo Go sin romper la app.
 
 **Cómo verificarlo:** generando una **development build** propia (`npx expo run:android` / `npx expo run:ios` o `npx eas-cli@latest build --profile development`), donde Continuous Native Generation (CNG) aplica todos los plugins de `app.json` y genera el binario nativo real de Biblioteca IPF.
 
@@ -681,7 +685,7 @@ Si hubiera que tocar más de dos archivos (por ejemplo, editar pantallas en `src
 | Se abre `/libro/abc` | Header “Libro no encontrado”, mensaje explicando que `"abc"` no tiene formato ISBN-13 de 13 dígitos y botón **“Volver al Catálogo”**. | `src/app/(tabs)/(catalogo)/libro/[isbn].tsx` (líneas 20–23 y 40–58). |
 | Se escanea un ISBN que no está en el catálogo | Banner de advertencia indicando que el ISBN no está en el catálogo de Biblioteca IPF, dejando la cámara activa para seguir escaneando o escribir a mano. | `src/app/escanear.tsx` (líneas 65–74 y 155–164). |
 | La cámara está bloqueada | Modal `/permisos/camara` con botón **“Abrir Ajustes”**; en `/escanear`, tarjeta “Cámara bloqueada” con botón “Abrir Ajustes” y el formulario de ingreso manual de ISBN siempre usable. | `src/hooks/usePermiso.ts` (líneas 31–36), `src/app/permisos/[recurso].tsx` (líneas 82–113) y `src/app/escanear.tsx` (líneas 137–152 y 166). |
-| Las notificaciones están denegadas | En `/reservas`, barra indicando que las notificaciones están bloqueadas; si activa “Recordarme”, modal con “Abrir Ajustes” + mensaje explicativo; si le entregan un libro desde mostrador, aparece un **aviso destacado dentro de `/reservas`**. | `src/app/(tabs)/reservas.tsx` (líneas 74–86 y 122–144), `src/lib/notificaciones.ts` (líneas 78–81) y `src/context/BibliotecaContext.tsx` (líneas 346–357). |
+| Las notificaciones están denegadas | En `/reservas`, barra indicando que las notificaciones están bloqueadas; si activa “Recordarme”, modal con “Abrir Ajustes” + mensaje explicativo; si le entregan un libro desde mostrador, aparece un **aviso destacado dentro de `/reservas`**. | `src/app/(tabs)/reservas.tsx` (líneas 74–86 y 122–144), `src/lib/notificaciones.ts` (líneas 85–106) y `src/context/BibliotecaContext.tsx` (líneas 346–357). |
 | Se intenta reservar un libro ya reservado | En `/libro/[isbn]`, botón deshabilitado “Ya reservado” con aviso del estado actual; si entra igual a `/reservar/[isbn]`, advertencia clara sin botón “Confirmar”; y `reservarLibro` devuelve `{ tipo: 'duplicado' }`. | `src/app/(tabs)/(catalogo)/libro/[isbn].tsx` (líneas 119–144), `src/app/reservar/[isbn].tsx` (líneas 85–91) y `src/context/BibliotecaContext.tsx` (líneas 201–206). |
 | “Entregar al siguiente” con la lista de espera vacía | Los libros con cola vacía no aparecen pendientes y el botón se deshabilita si `cantidad === 0`; además `entregarAlSiguiente` valida `colaActual.estaVacia()` y retorna `{ entregadoA: null }` sin fallar. | `src/app/mostrador.tsx` (líneas 35–42 y 85–91) y `src/context/BibliotecaContext.tsx` (líneas 292–299). |
 | Login con clave incorrecta | Caja de error clara en rojo (“Usuario o clave incorrectos. Revisá los datos e intentá de nuevo.”) sin cerrar el modal y limpiando el error al volver a escribir. | `src/app/login.tsx` (líneas 39–43 y 111–115) y `src/context/BibliotecaContext.tsx` (líneas 379–387). |
