@@ -27,16 +27,23 @@ export function configurarManejadorNotificaciones(): void {
   });
 }
 
-export async function asegurarCanalPrestamos(): Promise<void> {
+export async function asegurarCanalPrestamos(): Promise<boolean> {
   if (Platform.OS !== 'android') {
-    return;
+    return false;
   }
-  await setNotificationChannelAsync(CANAL_NOTIFICACIONES_ID, {
-    name: 'Recordatorios de préstamos',
-    description: 'Avisos antes de la devolución y entrega de libros reservados.',
-    importance: AndroidImportance.HIGH,
-    vibrationPattern: [0, 250, 250, 250],
-  });
+  try {
+    await setNotificationChannelAsync(CANAL_NOTIFICACIONES_ID, {
+      name: 'Recordatorios de préstamos',
+      description: 'Avisos antes de la devolución y entrega de libros reservados.',
+      importance: AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 250, 250],
+    });
+    return true;
+  } catch {
+    // En Expo Go (Android SDK 58), setNotificationChannelAsync puede fallar con
+    // NullPointerException (expo/expo#53907). Continuamos usando el canal por defecto.
+    return false;
+  }
 }
 
 export async function consultarPermisoNotificaciones(): Promise<NotificationPermissionsStatus> {
@@ -51,7 +58,7 @@ export async function solicitarPermisoNotificaciones(): Promise<NotificationPerm
 export async function programarRecordatorioDevolucion(
   tituloLibro: string,
 ): Promise<string> {
-  await asegurarCanalPrestamos();
+  const canalDisponible = await asegurarCanalPrestamos();
   return scheduleNotificationAsync({
     content: {
       title: 'Recordatorio de devolución · Biblioteca IPF',
@@ -62,7 +69,7 @@ export async function programarRecordatorioDevolucion(
       type: SchedulableTriggerInputTypes.TIME_INTERVAL,
       seconds: SEGUNDOS_RECORDATORIO_DEMO,
       repeats: false,
-      channelId: CANAL_NOTIFICACIONES_ID,
+      ...(canalDisponible ? { channelId: CANAL_NOTIFICACIONES_ID } : {}),
     },
   });
 }
@@ -83,13 +90,17 @@ export async function enviarNotificacionEntrega(
     return false;
   }
   await asegurarCanalPrestamos();
-  await scheduleNotificationAsync({
-    content: {
-      title: 'Tu libro ya está disponible · Biblioteca IPF',
-      body: `"${tituloLibro}" pasó a estar en préstamo a tu nombre. Podés retirarlo en mostrador.`,
-      sound: true,
-    },
-    trigger: null,
-  });
-  return true;
+  try {
+    await scheduleNotificationAsync({
+      content: {
+        title: 'Tu libro ya está disponible · Biblioteca IPF',
+        body: `"${tituloLibro}" pasó a estar en préstamo a tu nombre. Podés retirarlo en mostrador.`,
+        sound: true,
+      },
+      trigger: null,
+    });
+    return true;
+  } catch {
+    return false;
+  }
 }
